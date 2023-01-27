@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f7fafc; /* equivalent to bg-gray-100 */
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased; /* equivalent to antialiased */
+  -moz-osx-font-smoothing: grayscale;
+}
