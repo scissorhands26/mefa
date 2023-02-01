@@ -3,72 +3,23 @@ import "./App.css";
 
 function App() {
   const [mission, setMission] = useState("");
-  const [operatorCount, setOperatorCount] = useState(1);
-  const [operatorName, setOperatorName] = useState("");
-  const [operatorRank, setOperatorRank] = useState("");
-  const [operatorCert, setOperatorCert] = useState("");
-  const [operators, setOperators] = useState<any | null>([]);
 
-  const [eaCount, setEACount] = useState(1);
-  const [eaName, setEAName] = useState("");
-  const [eaRank, setEARank] = useState("");
-  const [eaCert, setEACert] = useState("");
-  const [eas, setEAs] = useState<any | null>([]);
+  const [name, setName] = useState("");
+  const [rank, setRank] = useState("");
+  const [cert, setCert] = useState("");
+  const [personnel, setPersonnel] = useState<any | null>([]);
 
   const [events, setEvents] = useState<any | null>([]);
   const [eventDetils, setEventDetails] = useState("");
 
+  const [data, setData] = useState<any | null>({});
+
   function handleChange(e: any) {
     console.log(e.target.value);
     if (e.target.id === "MissionName") setMission(e.target.value.toUpperCase());
-    if (e.target.id === "OperatorName")
-      setOperatorName(e.target.value.toUpperCase());
-    if (e.target.id === "OperatorRank")
-      setOperatorRank(e.target.value.toUpperCase());
-    if (e.target.id === "OperatorCert")
-      setOperatorCert(e.target.value.toUpperCase());
-    if (e.target.id === "EAName") setEAName(e.target.value.toUpperCase());
-    if (e.target.id === "EARank") setEARank(e.target.value.toUpperCase());
-    if (e.target.id === "EACert") setEACert(e.target.value.toUpperCase());
+    if (e.target.id === "Name") setName(e.target.value.toUpperCase());
+    if (e.target.id === "Rank") setRank(e.target.value.toUpperCase());
     if (e.target.id === "event") setEventDetails(e.target.value.toUpperCase());
-  }
-
-  function addOperator(e: any) {
-    e.preventDefault();
-    setOperatorCount(operatorCount + 1);
-    let id = Math.floor(Math.random() * 999999999) + 1;
-    let rank = operatorRank;
-    let name = operatorName;
-    let cert = operatorCert;
-
-    let operator = {
-      id,
-      rank,
-      name,
-      cert,
-    };
-
-    setOperators((prevOperators: any) => [...prevOperators, operator]);
-    e.target.reset();
-  }
-
-  function addEA(e: any) {
-    e.preventDefault();
-    setEACount(eaCount + 1);
-    let id = Math.floor(Math.random() * 999999999) + 1;
-    let rank = eaRank;
-    let name = eaName;
-    let cert = eaCert;
-
-    let ea = {
-      id,
-      rank,
-      name,
-      cert,
-    };
-
-    setEAs((prevEAs: any) => [...prevEAs, ea]);
-    e.target.reset();
   }
 
   function addEvent(e: any) {
@@ -86,23 +37,45 @@ function App() {
     setEvents((prevEvents: any) => [...prevEvents, event]);
   }
 
+  function addPersonnel(e: any, type: any) {
+    e.preventDefault();
+    let id = Math.floor(Math.random() * 999999999) + 1;
+
+    let person = {
+      id,
+      rank,
+      name,
+      cert,
+      type,
+    };
+
+    setPersonnel((prevPersonnel: any) => [...prevPersonnel, person]);
+    console.log(personnel);
+    e.target.reset();
+  }
+
+  function removePersonnel(id: any) {
+    let updatedPersonnel = personnel.filter((person: any) => {
+      return person.id !== id;
+    });
+    setPersonnel(updatedPersonnel);
+  }
+
   useEffect(() => {
-    console.log(operatorCount);
-  }, [operatorCount, operators, eas]);
+    const personnelString = localStorage.getItem("personnel");
+    if (!personnelString) {
+      localStorage.setItem("personnel", JSON.stringify([]));
+    } else {
+      const personnel = JSON.parse(personnelString);
+      setPersonnel(personnel);
+    }
+  }, []);
 
-  function removeOperator(id: any) {
-    let updatedOperators = operators.filter((operator: any) => {
-      return operator.id !== id;
-    });
-    setOperators(updatedOperators);
-  }
-
-  function removeEA(id: any) {
-    let updatedEAs = eas.filter((ea: any) => {
-      return ea.id !== id;
-    });
-    setEAs(updatedEAs);
-  }
+  useEffect(() => {
+    console.log(personnel.length);
+    if (personnel.length > 0)
+      localStorage.setItem("personnel", JSON.stringify(personnel));
+  }, [personnel]);
 
   return (
     <div className="w-screen">
@@ -122,83 +95,63 @@ function App() {
             </div>
           </div>
           <div>
-            <h2 className="text-4xl font-bold mx-1 my-5">Personnel</h2>
             <div className="flex flex-row m-1">
-              <label className="text-3xl font-bold mr-2">Operators:</label>
-              <form onSubmit={addOperator}>
+              <label className="text-3xl font-bold mr-2">Personnel:</label>
+              <form
+                onSubmit={(e) => {
+                  addPersonnel(e, "operator");
+                }}
+              >
                 <input
                   className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
                   type="text"
-                  placeholder="Operator Rank"
-                  id="OperatorRank"
+                  placeholder="Rank"
+                  id="Rank"
                   onChange={handleChange}
                 ></input>
                 <input
                   className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
                   type="text"
-                  placeholder="Operator Name"
-                  id="OperatorName"
+                  placeholder="Last Name"
+                  id="Name"
                   onChange={handleChange}
                 ></input>
-                <input
+                <select
                   className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
-                  type="text"
-                  placeholder="Operator Cert"
-                  id="OperatorCert"
-                  onChange={handleChange}
-                ></input>
+                  value={cert}
+                  onChange={(e) => setCert(e.target.value)}
+                >
+                  <option value="MC">MC</option>
+                  <option value="EA">EA</option>
+                  <option value="ION">ION</option>
+                  <option value="LCO">LCO</option>
+                  <option value="MC Trainee">MC Trainee</option>
+                  <option value="EA Trainee">EA Trainee</option>
+                  <option value="ION Trainee">ION Trainee</option>
+                  <option value="LCO Trainee">LCO Trainee</option>
+                </select>
                 <input
                   type="submit"
                   className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
                 ></input>
               </form>
             </div>
-            {operators.map((operator: any) => (
-              <div key={operator.id} className="flex flex-row text-center">
-                <span>🟩</span>
-                <h4 className="text-xl font-bold mx-1">{operator.rank}</h4>
-                <h4 className="text-xl font-bold mx-1">{operator.name}</h4>
-                <h4 className="text-xl font-bold mx-1">{operator.cert}</h4>
-                <button onClick={() => removeOperator(operator.id)}>🛑</button>
-              </div>
-            ))}
-            <div className="flex flex-row m-1">
-              <label className="text-3xl font-bold mr-2">EAs:</label>
-              <form onSubmit={addEA}>
-                <input
-                  className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
-                  type="text"
-                  placeholder="EA Rank"
-                  id="EARank"
-                  onChange={handleChange}
-                ></input>
-                <input
-                  className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
-                  type="text"
-                  placeholder="EA Name"
-                  id="EAName"
-                  onChange={handleChange}
-                ></input>
-                <input
-                  className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
-                  type="text"
-                  placeholder="EA Cert"
-                  id="EACert"
-                  onChange={handleChange}
-                ></input>
-                <input
-                  type="submit"
-                  className="bg-gray-200 mx-1 py-2 px-4 rounded-lg shadow-md border border-gray-400 focus:outline-none focus:shadow-outline-blue"
-                ></input>
-              </form>
-            </div>
-            {eas.map((ea: any) => (
-              <div key={ea.id} className="flex flex-row text-center">
-                <span>🟩</span>
-                <h4 className="text-xl font-bold mx-1">{ea.rank}</h4>
-                <h4 className="text-xl font-bold mx-1">{ea.name}</h4>
-                <h4 className="text-xl font-bold mx-1">{ea.cert}</h4>
-                <button onClick={() => removeEA(ea.id)}>🛑</button>
+            {personnel.map((personnel: any) => (
+              <div key={personnel.id} className="flex flex-row text-center">
+                {personnel.type === "operator" ? (
+                  <>
+                    <span>🟩</span>
+                    <h4 className="text-xl font-bold mx-1">{personnel.rank}</h4>
+                    <h4 className="text-xl font-bold mx-1">{personnel.name}</h4>
+                    <h4 className="text-xl font-bold mx-1">{personnel.cert}</h4>
+                    <h4 className="text-xl font-bold mx-1">{personnel.id}</h4>
+                    <button onClick={() => removePersonnel(personnel.id)}>
+                      🛑
+                    </button>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
             ))}
 
@@ -223,12 +176,11 @@ function App() {
 
         <section className="border-4 border-black h-screen p-2">
           <h1 className="text-7xl font-bold">MISSION: {mission}</h1>
-          <h1 className="text-5xl font-bold">Operators:</h1>
-          {operators.map((operator: any) => (
-            <div key={operator.id} className="flex flex-row text-center">
-              <h5 className="text-xl font-bold mx-1">{operator.rank}</h5>
-              <h5 className="text-xl font-bold mx-1">{operator.name}</h5>
-              <h5 className="text-xl font-bold mx-1">{operator.cert}</h5>
+          <h1 className="text-5xl font-bold">Personnel:</h1>
+          {personnel.map((person: any) => (
+            <div key={person.id} className="flex flex-row text-center">
+              <h5 className="text-xl font-bold mx-1">{person.rank}</h5>
+              <h5 className="text-xl font-bold mx-1">{person.name}</h5>
             </div>
           ))}
           <h1 className="text-5xl mt-10 font-bold">Events:</h1>
